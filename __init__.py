@@ -3,12 +3,11 @@ DSN receiver descriptions with no monitor and control functions
 """
 import logging
 
-from MonitorControl import IF, ObservatoryError
-from MonitorControl.Receivers import Receiver
+import MonitorControl as MC
 
 module_logger = logging.getLogger(__name__)
 
-class DSN_rx(Receiver):
+class DSN_rx(MC.Receivers.Receiver):
   """
   Class for DSN receivers with no M&C functions
 
@@ -35,7 +34,8 @@ class DSN_rx(Receiver):
     self.name = name # needed by the next statement
     mylogger.debug(" initializing %s", self)
     mylogger.debug(" %s inputs: %s", name, inputs)
-    Receiver.__init__(self, name, inputs=inputs, output_names=output_names)
+    MC.Receivers.Receiver.__init__(self, name, inputs=inputs,
+                                               output_names=output_names)
     self.logger = mylogger
     self.name = name
     self.data['frequency'] = 0.320 # GHz
@@ -44,7 +44,7 @@ class DSN_rx(Receiver):
     # no pol section
     self.DC = {}
     self.logger.debug(" Setting output properties")
-    for inname in self.inputs.keys():
+    for inname in list(self.inputs.keys()):
       outname = inname+"U" # all DSN receivers are USB
       self.DC[inname] = Receiver.DownConv(self, inname,
                                        inputs={inname: self.inputs[inname]},
@@ -52,7 +52,7 @@ class DSN_rx(Receiver):
       self.DC[inname].outputs[outname].source = self.DC[inname].inputs[inname]
       self.DC[inname].outputs[outname].source.destinations.append(
                                              self.DC[inname].outputs[outname])
-      self.DC[inname].outputs[outname].signal = IF(
+      self.DC[inname].outputs[outname].signal = MC.IF(
                            self.DC[inname].outputs[outname].source.signal,'U')
       self.DC[inname].outputs[outname].signal['IF frequency'] = self.data['frequency']
       self.DC[inname].outputs[outname].signal['IF bandwidth'] = self.data['bandwidth']
