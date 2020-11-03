@@ -46,7 +46,7 @@ class DSN_rx(MC.Receivers.Receiver):
     self.logger.debug(" Setting output properties")
     for inname in list(self.inputs.keys()):
       outname = inname+"U" # all DSN receivers are USB
-      self.DC[inname] = Receiver.DownConv(self, inname,
+      self.DC[inname] = MC.Receivers.Receiver.DownConv(self, inname,
                                        inputs={inname: self.inputs[inname]},
                                        output_names=[outname])
       self.DC[inname].outputs[outname].source = self.DC[inname].inputs[inname]
